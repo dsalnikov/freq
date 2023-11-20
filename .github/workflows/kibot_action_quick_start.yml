@@ -7,11 +7,15 @@ on:
     paths:
       - '*.kicad_sch'
       - '*.kicad_pcb'
+      - '*.kicad_sym'
+      - '*.lib'
       - '.github/workflows/kibot_action_quick_start.yml'
   pull_request:
     paths:
       - '*.kicad_sch'
       - '*.kicad_pcb'
+      - '*.kicad_sym'
+      - '*.lib'
       - '.github/workflows/kibot_action_quick_start.yml'
   repository_dispatch:
     types: [run_qs_gha]
