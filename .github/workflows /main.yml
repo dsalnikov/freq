@@ -1,0 +1,54 @@
+name: kicad
+env:
+  PUSH_NAME: 'dsalnikov'
+  PUSH_USER: 'dsalnikov'
+  PUSH_MESSAGE: 'Kicad Action'
+on:
+  push:
+    branches: main
+    paths:
+    - '**.sch'
+    - '**.kicad_pcb'
+  pull_request:
+    paths:
+      - '**.sch'
+      - '**.kicad_pcb'
+  workflow_dispatch:
+
+jobs:
+  kicad:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Write Config
+      run: |
+        echo "kibot:" > config.kibot.yml
+        echo "  version: 1" >> config.kibot.yml
+        echo "global:" >> config.kibot.yml
+        echo "  output: '%i.%x'" >> config.kibot.yml
+        echo "outputs:" >> config.kibot.yml
+        echo "- type: 'pcbdraw'" >> config.kibot.yml
+        echo "  name: 'pcb-front'" >> config.kibot.yml
+        echo "- type: 'pcbdraw'" >> config.kibot.yml
+        echo "  name: 'pcb-back'" >> config.kibot.yml
+        echo "  options:" >> config.kibot.yml
+        echo "    bottom: true" >> config.kibot.yml
+        echo "- type: 'bom'" >> config.kibot.yml
+        echo "  name: 'bom'" >> config.kibot.yml
+        echo "  options:" >> config.kibot.yml
+        echo "    csv:" >> config.kibot.yml
+        echo "      hide_pcb_info: true" >> config.kibot.yml
+        echo "      hide_stats_info: true" >> config.kibot.yml
+    - uses: INTI-CMNB/KiBot@v1
+      with:
+        config: config.kibot.yml
+        dir: output
+        schema: '*.sch'
+        board: '*.kicad_pcb'
+    - name: Push Changes
+      run: |
+        git config --global user.name "$PUSH_NAME"
+        git config --global user.email "$PUSH_USER@users.noreply.github.com"
+        git add output/*
+        git commit -m "$PUSH_MESSAGE"
+        git push
